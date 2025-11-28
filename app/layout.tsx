@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import UserSync from "@/components/UserSync";
 
 export const metadata: Metadata = {
   title: "ROBO Cloud",
@@ -13,7 +15,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <LanguageProvider>
+          <UserSync />
+          {children}
+        </LanguageProvider>
+      </body>
     </html>
   );
 }

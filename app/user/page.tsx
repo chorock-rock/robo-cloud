@@ -23,18 +23,9 @@ export default function UserPage() {
 
   const handleGoogleSignIn = async () => {
     try {
-      const result = await signInWithGoogle();
-      if (result?.user) {
-        // 사용자 정보를 Firestore에 저장 (비동기로 처리, 리디렉션을 막지 않음)
-        setDoc(doc(db, 'users', result.user.uid), {
-          email: result.user.email,
-          displayName: result.user.displayName,
-          createdAt: new Date(),
-        }, { merge: true }).catch((error) => {
-          console.error('사용자 정보 저장 실패:', error);
-        });
-      }
-      // 즉시 리디렉션 (Firestore 저장을 기다리지 않음)
+      // UserSync 컴포넌트가 자동으로 Firestore에 저장하므로 여기서는 로그인만 처리
+      await signInWithGoogle();
+      // 즉시 리디렉션
       router.push('/user/tablets');
     } catch (error) {
       console.error('로그인 실패:', error);

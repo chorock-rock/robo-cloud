@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // 동적 렌더링 강제 (prerender 방지)
 export const dynamic = 'force-dynamic';
@@ -30,12 +30,18 @@ export default function AdminPage() {
 
   // 운영자 권한 확인
   useEffect(() => {
+    if (loading) {
+      // 로딩 중일 때는 아무것도 하지 않음
+      return;
+    }
+    
     if (user) {
       checkAdminAccess();
     } else {
-      setIsAuthorized(null);
+      // 로그인하지 않은 경우
+      setIsAuthorized(false);
     }
-  }, [user]);
+  }, [user, loading]);
 
   const checkAdminAccess = async () => {
     if (!user) {
@@ -63,15 +69,8 @@ export default function AdminPage() {
 
   const handleGoogleSignIn = async () => {
     try {
-      const result = await signInWithGoogle();
-      if (result?.user) {
-        // 사용자 정보를 Firestore에 저장
-        await setDoc(doc(db, 'users', result.user.uid), {
-          email: result.user.email,
-          displayName: result.user.displayName,
-          createdAt: new Date(),
-        }, { merge: true });
-      }
+      // UserSync 컴포넌트가 자동으로 Firestore에 저장하므로 여기서는 로그인만 처리
+      await signInWithGoogle();
     } catch (error) {
       console.error('로그인 실패:', error);
     }
@@ -85,11 +84,9 @@ export default function AdminPage() {
     setLoadingUsers(true);
     try {
       // Firestore에서 사용자 정보를 가져옵니다
-      // 실제로는 Firebase Admin SDK를 사용하거나 별도의 users 컬렉션을 관리해야 합니다
-      // 여기서는 간단히 구현하기 위해 auth의 사용자 정보를 사용합니다
       const usersCollection = collection(db, 'users');
-      const q = query(usersCollection, orderBy('createdAt', 'desc'));
-      const querySnapshot = await getDocs(q);
+      // orderBy를 제거하여 createdAt 필드가 없는 문서도 포함되도록 함
+      const querySnapshot = await getDocs(usersCollection);
       const usersData: User[] = [];
 
       querySnapshot.forEach((doc) => {
@@ -99,6 +96,15 @@ export default function AdminPage() {
           email: data.email || null,
           displayName: data.displayName || null,
         });
+      });
+
+      // createdAt 기준으로 정렬 (있을 경우)
+      usersData.sort((a, b) => {
+        // 이메일 기준으로 정렬 (대체 방법)
+        if (a.email && b.email) {
+          return a.email.localeCompare(b.email);
+        }
+        return 0;
       });
 
       // users 컬렉션이 비어있을 경우 현재 사용자 추가
@@ -111,8 +117,17 @@ export default function AdminPage() {
       }
 
       setUsers(usersData);
+      console.log('로드된 사용자 수:', usersData.length);
     } catch (error) {
       console.error('사용자 로드 실패:', error);
+      // 에러 발생 시에도 현재 사용자라도 표시
+      if (user) {
+        setUsers([{
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+        }]);
+      }
     } finally {
       setLoadingUsers(false);
     }
@@ -152,10 +167,49 @@ export default function AdminPage() {
     }
   };
 
-  if (loading || isAuthorized === null) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-white">로딩 중...</div>
+      <div className="min-h-screen bg-[#000000] text-white flex items-center justify-center relative overflow-hidden">
+        <div className="pulse-bg"></div>
+        <div className="stars">
+          {Array.from({ length: 30 }).map((_, i) => (
+            <div
+              key={i}
+              className="star"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${2 + Math.random() * 2}s`,
+              }}
+            />
+          ))}
+        </div>
+        <div className="text-white text-xl relative z-10">로딩 중...</div>
+      </div>
+    );
+  }
+
+  // 권한 확인 중일 때만 로딩 표시
+  if (isAuthorized === null && user) {
+    return (
+      <div className="min-h-screen bg-[#000000] text-white flex items-center justify-center relative overflow-hidden">
+        <div className="pulse-bg"></div>
+        <div className="stars">
+          {Array.from({ length: 30 }).map((_, i) => (
+            <div
+              key={i}
+              className="star"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${2 + Math.random() * 2}s`,
+              }}
+            />
+          ))}
+        </div>
+        <div className="text-white text-xl relative z-10">권한 확인 중...</div>
       </div>
     );
   }
@@ -260,7 +314,7 @@ export default function AdminPage() {
                   <option value="">사용자를 선택하세요</option>
                   {users.map((u) => (
                     <option key={u.uid} value={u.uid}>
-                      {u.displayName || u.email || u.uid}
+                      {u.email || u.displayName || u.uid}
                     </option>
                   ))}
                 </select>

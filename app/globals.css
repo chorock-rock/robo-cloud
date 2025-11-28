@@ -1,3 +1,5 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,10 +11,34 @@
 
 body {
   color: var(--foreground);
-  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1629 100%);
+  background: #000000;
   background-attachment: fixed;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
   min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.scrollbar-hide * {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide *::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 @layer utilities {
@@ -74,6 +100,43 @@ body {
     transform: translateY(-20px);
   }
 }
+
+@keyframes slideUp {
+  from {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.chart-bar {
+  /* 기본 상태는 보이도록 설정 */
+  opacity: 1;
+  transform-origin: bottom;
+}
+
+.chart-bar:not(.animate) {
+  /* 애니메이션이 트리거되지 않으면 즉시 표시 */
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+.chart-bar.animate {
+  /* 애니메이션 시작 전 초기 상태 - 바닥에서 시작 */
+  transform: scaleY(0);
+  opacity: 0;
+  transform-origin: bottom;
+  animation: slideUp 0.8s ease-out forwards;
+}
+
+.chart-bar-delay-1 { animation-delay: 0.1s; }
+.chart-bar-delay-2 { animation-delay: 0.2s; }
+.chart-bar-delay-3 { animation-delay: 0.3s; }
+.chart-bar-delay-4 { animation-delay: 0.4s; }
+.chart-bar-delay-5 { animation-delay: 0.5s; }
 
 .pulse-bg {
   position: fixed;
@@ -167,6 +230,64 @@ body {
 .cosmic-icon {
   background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
   box-shadow: 0 0 20px rgba(59, 130, 246, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.1);
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  transition: transform 0.3s ease;
+}
+
+.cosmic-icon:hover {
+  transform: rotateY(15deg) rotateX(15deg) scale(1.1);
+  box-shadow: 0 10px 40px rgba(59, 130, 246, 0.6), inset 0 0 30px rgba(255, 255, 255, 0.2);
+}
+
+.cosmic-icon svg {
+  transform: translateZ(20px);
+  transition: transform 0.3s ease;
+}
+
+.cosmic-icon:hover svg {
+  transform: translateZ(30px) scale(1.1);
+}
+
+@keyframes icon-3d-float {
+  0%, 100% {
+    transform: translateY(0px) rotateY(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotateY(5deg);
+  }
+}
+
+.icon-3d-container {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.icon-3d-container:hover .cosmic-icon {
+  animation: icon-3d-float 2s ease-in-out infinite;
+}
+
+.icon-3d-1 {
+  transform: rotateY(-5deg) rotateX(5deg);
+}
+
+.icon-3d-2 {
+  transform: rotateY(0deg) rotateX(5deg);
+  animation-delay: 0.5s;
+}
+
+.icon-3d-3 {
+  transform: rotateY(5deg) rotateX(5deg);
+  animation-delay: 1s;
+}
+
+.icon-3d-svg {
+  transform: translateZ(20px);
+  transition: transform 0.3s ease;
+}
+
+.icon-3d-container:hover .icon-3d-svg {
+  transform: translateZ(30px) scale(1.1);
 }
 
 .pulse-ring {
