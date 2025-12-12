@@ -41,6 +41,34 @@ body {
   height: 0;
 }
 
+/* 항상 스크롤바 표시 */
+.scrollbar-always {
+  overflow-x: scroll;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(59, 130, 246, 0.5) rgba(30, 58, 138, 0.2);
+}
+
+.scrollbar-always::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  display: block;
+}
+
+.scrollbar-always::-webkit-scrollbar-track {
+  background: rgba(30, 58, 138, 0.2);
+  border-radius: 4px;
+}
+
+.scrollbar-always::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.5);
+  border-radius: 4px;
+}
+
+.scrollbar-always::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.7);
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

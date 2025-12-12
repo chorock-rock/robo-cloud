@@ -44,7 +44,6 @@ export default function InfoPage() {
 
   return (
     <div className="min-h-screen text-white relative overflow-hidden bg-[#000000]">
-      {/* 우주 배경 효과 */}
       <div className="pulse-bg"></div>
       <div className="stars">
         {Array.from({ length: 30 }).map((_, i) => (

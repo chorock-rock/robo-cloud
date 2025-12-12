@@ -56,3 +56,7 @@ service cloud.firestore {
 
 Firebase Console에서 `admins` 컬렉션의 해당 문서를 삭제하면 됩니다.
 
+
+
+
+
